@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <!-- Futuro css -->
+</head>
+<body>
+    <h1>Carrito de Compras</h1>
+
+    <button onclick="agregarProducto()">Agregar Producto</button>
+
+    <div id="productos-lista"></div>
+
+    <!-- seccion de descuento -->
+
+    <input type="text" id="codigo-descuento" placeholder="Codigo de descuento">
+    <button onclick="aplicarDescuento()">Aplicar descuento</button>
+    <ul>
+        <li>Codigo de descuento: descuento10</li>
+        <li>Codigo de descuento: descuento20</li>
+    </ul>
+
+    <div id="total">Total: $0</div>
+    <div id="descuento">Descuento: $0</div>
+    <div id="total-con-descuento"> Total con descuento: $0</div>
+
+
+    <script src="JS/main.js"></script>
+</body>
+</html>
