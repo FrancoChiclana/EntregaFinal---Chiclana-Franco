@@ -1,5 +1,13 @@
-let carrito = [];
-let descuento = 0;
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let descuento = parseFloat(localStorage.getItem("descuento")) || 0;
+
+document.addEventListener("DOMContentLoaded", () => {
+    actualizarInterfaz();
+
+
+    document.getElementById("agregar-producto-btn").addEventListener("click", agregarProducto);
+    document.getElementById("aplicar-descuento-btn").addEventListener("click", aplicarDescuento);
+});
 
 //Funciones
 
@@ -26,6 +34,8 @@ function agregarProducto() {
         carrito.push({ nombre: nombre, precio: precio, cantidad: cantidad});
     }
     
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+
     actualizarInterfaz();
 }
 
@@ -35,17 +45,16 @@ function actualizarInterfaz() {
 
     let total = 0;
 
-    for (let i = 0; i < carrito.length; i++) {
-        let producto = carrito[i];
+    carrito.forEach((producto, index) => {
         let divProducto = document.createElement("div");
         divProducto.classList.add("producto");
         divProducto.innerHTML = `${producto.nombre} - $${producto.precio} x ${producto.cantidad} = $${producto.precio * producto.cantidad}
-            <button onclick="eliminarProducto(${i})">Eliminar</button>
-            <button onclick="modificarCantidad(${i})>Modificar Cantidad</button>`;
+            <button onclick="eliminarProducto(${index})">Eliminar</button>
+            <button onclick="modificarCantidad(${index})">Modificar Cantidad</button>`
         lista.appendChild(divProducto);
 
         total += producto.precio * producto.cantidad;
-    }
+    });
 
 
     let totalDescuento = total - descuento;
@@ -58,6 +67,9 @@ function actualizarInterfaz() {
 
 function eliminarProducto(index) {
     carrito.splice(index ,1);
+
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+
     actualizarInterfaz();
 }
 
@@ -73,6 +85,8 @@ function aplicarDescuento() {
         descuento = 0;
         alert("Codigo de descuento no valido");
     }
+
+    localStorage.setItem("descuento", descuento);
 
     actualizarInterfaz();
 
