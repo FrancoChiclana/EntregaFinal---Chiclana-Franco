@@ -77,10 +77,12 @@ function eliminarProducto(index) {
 function aplicarDescuento() {
     let codigo = document.getElementById("codigo-descuento").value.trim();
 
+    let total = calcularTotal();
+
     if (codigo === "descuento10") {
-        descuento = 0.10 * calcularTotal();
+        descuento = 0.10 * total();
     } else if (codigo === "descuento20") {
-        descuento = 0.20 * calcularTotal();
+        descuento = 0.20 * total();
     } else {
         descuento = 0;
         alert("Codigo de descuento no valido");
@@ -99,3 +101,16 @@ function calcularTotal() {
     }
     return total;
 }
+
+
+function modificarCantidad(index) {
+    let nuevaCantidad = prompt("Ingrese la nueva cantidad", carrito[index].cantidad);
+    nuevaCantidad = parseInt(nuevaCantidad);
+
+    if (isNaN(nuevaCantidad) || nuevaCantidad <= 0) return;
+
+    carrito[index].cantidad = nuevaCantidad;
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarInterfaz();
+}
+ 
