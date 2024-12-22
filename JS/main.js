@@ -2,11 +2,14 @@ let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
 let descuento = parseFloat(localStorage.getItem("descuento")) || 0;
 
 document.addEventListener("DOMContentLoaded", () => {
-    actualizarInterfaz();
+    actualizarInterfaz()
+        .then(() => {
+            document.getElementById("agregar-producto-btn").addEventListener("click", agregarProducto);
+            document.getElementById("aplicar-descuento-btn").addEventListener("click", aplicarDescuento);
+        })
 
+        .catch((error) => console.error("Error en actualizar la interfaz", error));
 
-    document.getElementById("agregar-producto-btn").addEventListener("click", agregarProducto);
-    document.getElementById("aplicar-descuento-btn").addEventListener("click", aplicarDescuento);
 });
 
 //Funciones
@@ -16,7 +19,7 @@ function agregarProducto() {
     if (!nombre) return;
 
     let precio = parseFloat(prompt("Precio del producto"));
-    if (isNaN(precio) || precio <=0) return;
+    if (isNaN(precio) || precio <= 0) return;
 
     let cantidad = parseInt(prompt("Ingrese cantidad de productos"));
     if (isNaN(cantidad) || cantidad <= 0) return; 
@@ -40,8 +43,10 @@ function agregarProducto() {
 }
 
 function actualizarInterfaz() {
-    let lista = document.getElementById("productos-lista");
-    lista.innerHTML = "";
+    return new Promise((resikve, reject) => {
+        let lista = document.getElementById("productos-lista")
+        lista.innerHTML = "";
+    
 
     let total = 0;
 
@@ -62,44 +67,58 @@ function actualizarInterfaz() {
     document.getElementById("total").textContent = `Total: $${total.toFixed(2)}`;
     document.getElementById("descuento").textContent = `Descuento: $${descuento.toFixed(2)}`;
     document.getElementById("total-con-descuento").textContent = `Total con Descuento: $${totalDescuento.toFixed(2)}`;
+
+    resolve();
+});
+
 }
 
 
 function eliminarProducto(index) {
-    carrito.splice(index ,1);
 
-    localStorage.setItem("carrito", JSON.stringify(carrito));
+    return new Promise((resolve, reject) =>{
+        carrito.splice(index, 1);
+        
+        localStorage.setItem("carrito", JSON.stringify(carrito));
 
-    actualizarInterfaz();
+        actualizarInterfaz().then(resolve).catch(reject);
+    });
+    
 }
 
 
 function aplicarDescuento() {
     let codigo = document.getElementById("codigo-descuento").value.trim();
 
-    let total = calcularTotal();
+    let total = calcularTotal()
+        .then ((total) => {
+            if (codigo === "descuento10") {
+                descuento = 0.10 * total();
+            } else if (codigo === "descuento20") {
+                descuento = 0.20 * total();
+            } else {
+                descuento = 0;
+                alert("Codigo de descuento no valido");
+            }
 
-    if (codigo === "descuento10") {
-        descuento = 0.10 * total();
-    } else if (codigo === "descuento20") {
-        descuento = 0.20 * total();
-    } else {
-        descuento = 0;
-        alert("Codigo de descuento no valido");
-    }
+            localStorage.setItem("descuento", descuento);
+            
+            actualizarInterfaz();
+        
+        })
 
-    localStorage.setItem("descuento", descuento);
-
-    actualizarInterfaz();
-
+        .catch((error) => console.error("Error al aplicar descuento:", error));
 }
 
 function calcularTotal() {
-    let total = 0;
-    for (let i = 0; i < carrito.length; i++) {
-        total += carrito[i].precio * carrito[i].cantidad;
-    }
-    return total;
+    return new Promise((resolve, reject) => {
+        let total = 0;
+        for (let i = 0; i < carrito.leght; i++){
+            total += carrito[i].precio + carrito[i].cantidad;
+        }
+        resolve(total);
+    })
+    
 }
 
 
@@ -112,5 +131,26 @@ function modificarCantidad(index) {
     carrito[index].cantidad = nuevaCantidad;
     localStorage.setItem("carrito", JSON.stringify(carrito));
     actualizarInterfaz();
+};
+
+function obtenerProductos() {
+    return new Promise((resolve, reject) => {
+        fetch("https://falso.link.com/productos")
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error ("Error al obtener producto");
+            }
+
+            return response.json();
+        })
+        .then((productos) => {
+            console.log("Productos obtenidos:", productos);
+            resolve(productos);
+        })
+        .catch((error) => {
+            console.error("Error en la solicitud", error);
+            reject(error);
+        });
+    });
 }
  
